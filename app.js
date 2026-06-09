@@ -230,7 +230,7 @@ userForm.addEventListener("submit", (e) => {
 
     // Validação básica obrigatória para evitar salvar dados vazios cruciais (Nome/Email)
     if (!name || !email) {
-        alert("Campos de Nome e E-mail são obrigatórios para simular o cadastro.");
+        showToast("Campos de Nome e E-mail são obrigatórios para simular o cadastro.", "error");
         return;
     }
 
@@ -384,3 +384,69 @@ function escapeHTML(str) {
         }[tag] || tag)
     );
 }
+
+// Função para exibir Toast personalizado
+function showToast(message, type = 'error') {
+    // Cria o container de toasts se não existir
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    // Cria o elemento do toast
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+
+    // Define o ícone de acordo com o tipo
+    let iconName = 'alert-circle';
+    if (type === 'success') iconName = 'check-circle';
+    if (type === 'warning') iconName = 'alert-triangle';
+
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <i data-lucide="${iconName}"></i>
+        </div>
+        <div class="toast-content">${escapeHTML(message)}</div>
+        <button class="toast-close" title="Fechar">
+            <i data-lucide="x"></i>
+        </button>
+    `;
+
+    container.appendChild(toast);
+    
+    // Inicializa os ícones do Lucide no novo elemento
+    lucide.createIcons({
+        attrs: {
+            class: 'lucide-icon'
+        },
+        nameAttr: 'data-lucide',
+        node: toast
+    });
+
+    // Configura o fechamento automático após 4 segundos
+    const autoCloseTimeout = setTimeout(() => {
+        closeToast(toast);
+    }, 4000);
+
+    // Evento de clique para fechar manualmente
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+        clearTimeout(autoCloseTimeout);
+        closeToast(toast);
+    });
+}
+
+function closeToast(toast) {
+    toast.classList.add('toast-fadeOut');
+    toast.addEventListener('transitionend', () => {
+        toast.remove();
+        
+        // Remove o container se estiver vazio
+        const container = document.querySelector('.toast-container');
+        if (container && container.childElementCount === 0) {
+            container.remove();
+        }
+    });
+}
+
