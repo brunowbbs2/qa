@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGU - Sistema de Gerenciamento de Usuários (Ambiente de Testes)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons for premium visual icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Painel de Login -->
+    <div id="login-container" class="page-container active">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-icon">
+                    <i data-lucide="shield-alert"></i>
+                </div>
+                <h1>SGU QA</h1>
+                <p>Portal de Acesso (Ambiente de Homologação)</p>
+            </div>
+            
+            <form id="login-form" novalidate>
+                <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="mail" class="input-icon"></i>
+                        <!-- Bug no Login: novalidate no form e input tipo text ou email sem validação rígida no front -->
+                        <input type="text" id="login-email" placeholder="Ex: admin ou admin@sgu.com" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="lock" class="input-icon"></i>
+                        <input type="password" id="login-password" placeholder="Digite sua senha" required>
+                    </div>
+                </div>
+
+                <div id="login-error-msg" class="error-message hidden">
+                    <i data-lucide="alert-circle"></i>
+                    <span id="error-text">E-mail ou senha incorretos.</span>
+                </div>
+
+                <button type="submit" id="btn-login" class="btn btn-primary btn-block">
+                    <span>Acessar o Painel</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </form>
+            <div class="login-footer">
+                <p>Atenção: Sistema modificado para testes de QA.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Painel Dashboard (CRUD de Usuários) -->
+    <div id="dashboard-container" class="page-container">
+        <!-- Barra de Navegação Superior -->
+        <header class="navbar">
+            <div class="nav-brand">
+                <div class="logo-icon-small">
+                    <i data-lucide="shield-alert"></i>
+                </div>
+                <h2>SGU <span>Dashboard</span></h2>
+            </div>
+            <div class="nav-user-info">
+                <div class="user-avatar">
+                    <i data-lucide="user"></i>
+                </div>
+                <div class="user-details">
+                    <span id="logged-user-email">usuario@teste.com</span>
+                    <span id="logged-user-profile" class="badge">Perfil</span>
+                </div>
+                <button id="btn-logout" class="btn btn-icon-text btn-danger-outline">
+                    <i data-lucide="log-out"></i>
+                    <span>Sair</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Conteúdo Principal -->
+        <main class="dashboard-content">
+            
+            <!-- Linha superior de títulos e estatísticas rápidas -->
+            <div class="content-header">
+                <div>
+                    <h1>Gerenciamento de Usuários</h1>
+                    <p>Cadastre, edite, liste ou remova colaboradores no sistema.</p>
+                </div>
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <i data-lucide="users" class="stat-icon purple"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-total-users">0</span>
+                            <span class="stat-label">Total de Usuários</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Layout para o Cadastro e a Listagem -->
+            <div class="dashboard-grid">
+                
+                <!-- Coluna 1: Formulário de Cadastro (Inserção / Edição) -->
+                <section class="card form-card">
+                    <div class="card-header">
+                        <h3 id="form-title">
+                            <i data-lucide="user-plus"></i>
+                            <span>Novo Usuário</span>
+                        </h3>
+                        <button id="btn-cancel-edit" class="btn btn-sm btn-secondary-outline hidden">
+                            Cancelar Edição
+                        </button>
+                    </div>
+                    
+                    <form id="user-form" novalidate>
+                        <!-- ID oculto para controle de Edição -->
+                        <input type="hidden" id="user-id">
+
+                        <div class="form-group">
+                            <label for="user-name">Nome Completo</label>
+                            <input type="text" id="user-name" placeholder="Ex: Wesley Bruno Santos" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="user-email">E-mail Corporativo</label>
+                            <input type="email" id="user-email" placeholder="Ex: wesley.bruno@empresa.com" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="user-age">Idade</label>
+                                <!-- Bug no Cadastro: permite salvar deixando Idade em branco ou negativo -->
+                                <input type="number" id="user-age" placeholder="Ex: 28">
+                            </div>
+                            <div class="form-group">
+                                <label for="user-profile">Perfil de Acesso</label>
+                                <select id="user-profile" required>
+                                    <option value="Admin">Administrador (Admin)</option>
+                                    <option value="Usuário" selected>Usuário Padrão</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="user-cpf">CPF</label>
+                                <!-- Bug no Cadastro: aceita letras e não formata -->
+                                <input type="text" id="user-cpf" placeholder="000.000.000-00">
+                            </div>
+                            <div class="form-group">
+                                <label for="user-birth">Data de Nascimento</label>
+                                <!-- Bug no Cadastro: permite selecionar datas no futuro -->
+                                <input type="date" id="user-birth">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="user-phone">Telefone de Contato</label>
+                            <!-- Bug no Cadastro: não tem limite de caracteres -->
+                            <input type="text" id="user-phone" placeholder="Ex: (11) 99999-9999">
+                        </div>
+
+                        <!-- Bug no Cadastro: botão Salvar NÃO é desabilitado ao clicar -->
+                        <button type="submit" id="btn-save-user" class="btn btn-primary btn-block">
+                            <i data-lucide="check"></i>
+                            <span>Salvar Usuário</span>
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Coluna 2: Tabela de Listagem -->
+                <section class="card table-card">
+                    <div class="card-header">
+                        <h3>
+                            <i data-lucide="list"></i>
+                            <span>Lista de Usuários Cadastrados</span>
+                        </h3>
+                        <div class="search-box">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="search-input" placeholder="Pesquisar por nome ou e-mail...">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Contato</th>
+                                    <th>CPF / Idade</th>
+                                    <th>Nascimento</th>
+                                    <th>Perfil</th>
+                                    <th class="actions-header">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- Preenchido dinamicamente via app.js -->
+                            </tbody>
+                        </table>
+                        <div id="no-users-msg" class="empty-state hidden">
+                            <i data-lucide="users-round"></i>
+                            <p>Nenhum usuário cadastrado no sistema.</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts da aplicação -->
+    <script src="app.js"></script>
+</body>
+</html>
